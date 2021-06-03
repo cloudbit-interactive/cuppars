@@ -1,0 +1,11 @@
+[package]
+name = "cuppa"
+version = "0.0.1"
+description = "Standard library with usefull methods to boots the development"
+authors = ["Tufik Chediak <tufik2@gmail.com>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/cloudbit-interactive/cuppars.git"
+
+[dependencies]
+serde_json = "1.0.64"
