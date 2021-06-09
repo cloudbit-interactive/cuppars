@@ -1,6 +1,6 @@
-use cuppa::{json_decode, test};
+use cuppa::{json_decode};
 
 fn main() { 
     let result = json_decode(r#"{"name":"Tufik", "age":99}"#).unwrap();
-    println!("{:?} {}", result["name"], test("Hello Test"));
+    println!("{:?}", result["name"]);
 }

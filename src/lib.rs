@@ -1,3 +1,7 @@
+/*
+    [dependencies]
+    serde_json = "1.0.64"
+*/
 use serde_json::{Result, Value};
 
 /// # Example:
