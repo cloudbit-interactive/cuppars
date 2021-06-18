@@ -23,7 +23,7 @@ pub struct DataBase{
 
 impl DataBase {
     
-    /// EXAMPLE
+    /// # EXAMPLE
     /// ```
     /// let mut db = DataBase::new("localhost", 3306, "rust", "root", "");
     /// ```
@@ -33,6 +33,34 @@ impl DataBase {
         let conn = mysql::Conn::new(opts).unwrap();
         let db = DataBase { host, port, db, user, pass, conn };
         db
+    }
+
+    /// Mix of Insert / Update: The method checks if a row already exists and update it; otherwise, insert a new record. Both cases return the affected row.
+    /// 
+    /// # EXAMPLE
+    /// ```
+    /// let mut data:serde_json::Map<String, serde_json::Value> = serde_json::Map::new();
+    ///     data.insert("name".to_string(), json!("Zulay"));
+    /// 
+    /// let row = db.add("users".to_string(), data, "id = 10".to_string(), "".to_string());
+    /// println!("{:?}", row);
+    /// ```
+    pub fn add(&mut self, table:String, data:serde_json::Map<String, serde_json::Value>, condition:String, columns:String)
+    -> std::result::Result<serde_json::Map<String, serde_json::Value>, String>
+    {
+        let row = self.get_row(table.clone(), condition.clone(), "".to_string(), "".to_string());
+        let result;
+        if row.is_err(){
+            result = self.insert(table, data, columns);
+        }else{
+            result = self.update(table, data, condition, columns);
+        }
+
+        if result.is_err() {
+            return Err(format!("{}", result.unwrap_err()));
+        }
+
+        std::result::Result::Ok(result.clone().unwrap())
     }
 
     /// # Example

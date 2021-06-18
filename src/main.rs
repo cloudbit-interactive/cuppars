@@ -33,4 +33,12 @@ fn main() {
     let row = db.update("users".to_string(), data, "id = 3".to_string(), "".to_string());
         println!("{:?}", row);
     */
+
+    /* */
+    let mut data:serde_json::Map<String, serde_json::Value> = serde_json::Map::new();
+        data.insert("name".to_string(), json!("Zulay"));
+    let row = db.add("users".to_string(), data, "id = 333".to_string(), "".to_string());
+        println!("{:?}", row);
+   
+
 }
