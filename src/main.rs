@@ -22,7 +22,6 @@ fn main() {
     /*
     let mut data:serde_json::Map<String, serde_json::Value> = serde_json::Map::new();
             data.insert("name".to_string(), json!("Francisco"));
-
     let row = db.insert("users".to_string(), data, "".to_string());
     println!("{:?}", row);
     */
@@ -39,6 +38,4 @@ fn main() {
         data.insert("name".to_string(), json!("Zulay"));
     let row = db.add("users".to_string(), data, "id = 333".to_string(), "".to_string());
         println!("{:?}", row);
-   
-
 }
