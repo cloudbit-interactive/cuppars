@@ -1,6 +1,6 @@
 [package]
 name = "cuppa"
-version = "0.0.6"
+version = "0.0.7"
 description = "Standard library with usefull methods to boots the development"
 authors = ["Tufik Chediak <tufik2@gmail.com>"]
 edition = "2018"

@@ -1,6 +1,7 @@
 # DataBase
 
 Add next dependencies to your Cargo.toml
+
 ``` toml
 [dependencies]
 mysql = "20.1.0"
@@ -13,27 +14,29 @@ Example
 
 ``` rust
 use cuppa::database::DataBase;
-use serde_json::{json};
+use serde_json::{json, Map};
 
 fn main() { 
     // CREATE CONNECTION
     let mut db = DataBase::new("localhost", 3306, "rust", "root", "");
 
     // ADD: IF ROW EXIST UPDATE IT, OTHERWISE INSERT A NEW ROW
-    let mut data:serde_json::Map<String, serde_json::Value> = serde_json::Map::new();
+    let mut data = Map::new();
         data.insert("name".to_string(), json!("Francisco"));
     let row = db.update("users".to_string(), data, "id = 3".to_string(), "".to_string());
     println!("{:?}", row);
 
     // INSERT
-    let mut data:serde_json::Map<String, serde_json::Value> = serde_json::Map::new();
-            data.insert("name".to_string(), json!("Francisco"));
+    let mut data = Map::new();
+        data.insert("name".to_string(), json!("Francisco"));
+
     let row = db.update("users".to_string(), data, "id = 3".to_string(), "".to_string());
     println!("{:?}", row);
 
     // UPDATE
-    let mut data:serde_json::Map<String, serde_json::Value> = serde_json::Map::new();
-            data.insert("name".to_string(), json!("Francisco"));
+    let mut data = Map::new();
+        data.insert("name".to_string(), json!("Francisco"));
+
     let row = db.update("users".to_string(), data, "id = 3".to_string(), "".to_string());
     println!("{:?}", row);
 

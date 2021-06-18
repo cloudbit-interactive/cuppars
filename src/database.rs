@@ -39,10 +39,10 @@ impl DataBase {
     /// 
     /// # EXAMPLE
     /// ```
-    /// let mut data:serde_json::Map<String, serde_json::Value> = serde_json::Map::new();
+    /// let mut data = Map::new();
     ///     data.insert("name".to_string(), json!("Zulay"));
     /// 
-    /// let row = db.add("users".to_string(), data, "id = 10".to_string(), "".to_string());
+    /// let row = db.add("users".to_string(), data, "id = 333".to_string(), "".to_string());
     /// println!("{:?}", row);
     /// ```
     pub fn add(&mut self, table:String, data:serde_json::Map<String, serde_json::Value>, condition:String, columns:String)
@@ -66,7 +66,7 @@ impl DataBase {
     /// # Example
     ///
     /// ```
-    /// let mut data:serde_json::Map<String, serde_json::Value> = serde_json::Map::new();
+    /// let mut data = Map::new();
     ///     data.insert("name".to_string(), json!("Francisco"));
     /// 
     /// let row = db.insert("users".to_string(), data, "".to_string());
@@ -109,7 +109,7 @@ impl DataBase {
     /// # Example
     ///
     /// ```
-    /// let mut data:serde_json::Map<String, serde_json::Value> = serde_json::Map::new();
+    /// let mut data = Map::new();
     ///     data.insert("name".to_string(), json!("Francisco"));
     ///
     /// let row = db.update("users".to_string(), data, "id = 1".to_string(), "".to_string());
