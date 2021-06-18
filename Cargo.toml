@@ -6,6 +6,8 @@ authors = ["Tufik Chediak <tufik2@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/cloudbit-interactive/cuppars.git"
+keywords = ["database", "sql", "mysql"]
+categories = ["general", "database"]
 
 [lib]
 name = "cuppa"
