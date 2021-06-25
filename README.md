@@ -18,7 +18,7 @@ use serde_json::{json, Map};
 
 fn main() { 
     // CREATE CONNECTION
-    let mut db = DataBase::new("localhost", 3306, "rust", "root", "");
+    let db = DataBase::new("localhost", 3306, "rust", "root", "");
 
     // ADD: IF ROW EXIST UPDATE IT, OTHERWISE INSERT A NEW ROW
     let mut data = Map::new();
