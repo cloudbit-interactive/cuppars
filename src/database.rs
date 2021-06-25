@@ -4,7 +4,7 @@
 /// serde = { version = "1.0.126", features = ["derive"] }
 /// serde_derive = "1.0.126"
 
-use mysql;
+use mysql::{Pool};
 use mysql::prelude::*;
 use serde_json::{json};
 use std;
@@ -18,20 +18,19 @@ pub struct DataBase{
     pub db:&'static str,
     pub user:&'static str,
     pub pass:&'static str,
-    pub conn:mysql::Conn,
+    pub pool:mysql::Pool,
 }
 
 impl DataBase {
     
     /// # EXAMPLE
     /// ```
-    /// let mut db = DataBase::new("localhost", 3306, "rust", "root", "");
+    /// let db = DataBase::new("localhost", 3306, "rust", "root", "");
     /// ```
     pub fn new(host: &'static str, port: u16, db: &'static str, user:&'static str, pass:&'static str) -> DataBase {
         let url = format!("mysql://{}:{}@{}:{}/{}", user, pass, host, port, db);
-        let opts = mysql::Opts::from_url(&url).unwrap();
-        let conn = mysql::Conn::new(opts).unwrap();
-        let db = DataBase { host, port, db, user, pass, conn };
+        let pool = Pool::new(url).unwrap();
+        let db = DataBase { host, port, db, user, pass, pool};
         db
     }
 
@@ -45,7 +44,7 @@ impl DataBase {
     /// let row = db.add("users".to_string(), data, "id = 333".to_string(), "".to_string());
     /// println!("{:?}", row);
     /// ```
-    pub fn add(&mut self, table:String, data:serde_json::Map<String, serde_json::Value>, condition:String, columns:String)
+    pub fn add(&self, table:String, data:serde_json::Map<String, serde_json::Value>, condition:String, columns:String)
     -> std::result::Result<serde_json::Map<String, serde_json::Value>, String>
     {
         let row = self.get_row(table.clone(), condition.clone(), "".to_string(), "".to_string());
@@ -72,7 +71,7 @@ impl DataBase {
     /// let row = db.insert("users".to_string(), data, "".to_string());
     /// println!("{:?}", row);
     /// ```
-    pub fn insert(&mut self, table:String, data:serde_json::Map<String, serde_json::Value>, columns: String)
+    pub fn insert(&self, table:String, data:serde_json::Map<String, serde_json::Value>, columns: String)
     -> std::result::Result<serde_json::Map<String, serde_json::Value>, String>
     {
         let mut keys:Vec<String> = Vec::new();
@@ -92,8 +91,8 @@ impl DataBase {
             return Err(format!("{}", result.unwrap_err()));
         }
 
-        let last_insert_id = self.last_insert_id();
-        let row = self.get_row(table, format!("id = {}", last_insert_id), "".to_string(), columns);
+        let last_table_id = self.last_table_id(table.clone());
+        let row = self.get_row(table, format!("id = {}", last_table_id), "".to_string(), columns);
 
         if row.is_err(){
             return Err(format!("{}", row.unwrap_err()));
@@ -115,7 +114,7 @@ impl DataBase {
     /// let row = db.update("users".to_string(), data, "id = 1".to_string(), "".to_string());
     /// println!("{:?}", row);
     /// ```
-    pub fn update(&mut self, table:String, data:serde_json::Map<String, serde_json::Value>, condition:String, columns:String)
+    pub fn update(&self, table:String, data:serde_json::Map<String, serde_json::Value>, condition:String, columns:String)
     -> std::result::Result<serde_json::Map<String, serde_json::Value>, String>
     {
         let mut values:Vec<String> = Vec::new();
@@ -152,7 +151,7 @@ impl DataBase {
     /// let rows = db.get_list("users".to_string(), "".to_string(), "10".to_string(), "id ASC".to_string(), "id, name".to_string());
     /// println!("{:?}", rows);
     /// ```
-    pub fn get_list(&mut self, table:String, condition:String, limit:String, order_by:String, columns:String) 
+    pub fn get_list(&self, table:String, condition:String, limit:String, order_by:String, columns:String) 
     -> std::result::Result<Vec<serde_json::Map<String, serde_json::Value>>, String>
     {
         let mut sql = format!("SELECT * FROM {}", table);
@@ -173,10 +172,10 @@ impl DataBase {
     /// # Example
     ///
     /// ```
-    /// let row = db.get_row("users".to_string(), "id = 99".to_string(), "".to_string(), "".to_string());
+    /// let row = db.get_row("users".to_string(), "id = 1".to_string(), "".to_string(), "".to_string());
     /// println!("{:?}", row);
     /// ```
-    pub fn get_row(&mut self, table:String, condition: String, order_by: String, columns: String) 
+    pub fn get_row(&self, table:String, condition: String, order_by: String, columns: String) 
     -> std::result::Result<serde_json::Map<String, serde_json::Value>, String>
     {
         let mut sql = format!("SELECT * FROM {}", table);
@@ -206,7 +205,7 @@ impl DataBase {
     /// let rows = db.sql("SELECT * from users".to_string()).unwrap();
     /// println!("{:?}", rows);
     /// ```    
-    pub fn sql(&mut self, sql:String)
+    pub fn sql(&self, sql:String)
     -> std::result::Result<Vec<serde_json::Map<String, serde_json::Value>>, String>
     {
         let result = self.__sql__(sql);
@@ -218,11 +217,12 @@ impl DataBase {
         }
     }
 
-    fn __sql__(&mut self, sql:String)
+    fn __sql__(&self, sql:String)
     -> mysql::Result<Vec<serde_json::Map<String, serde_json::Value>>>
     {
+        let mut conn = self.pool.get_conn().unwrap();
         let mut result:Vec<serde_json::Map<String, serde_json::Value>> = Vec::new();
-        let rows:Vec<mysql::Row> = self.conn.exec(sql, ())?;
+        let rows:Vec<mysql::Row> = conn.exec(sql, ())?;
         for i in 0..rows.len() {
             let map = self.row_to_map(rows[i].clone());
             result.push(map);
@@ -230,7 +230,7 @@ impl DataBase {
         std::result::Result::Ok(result)
     }
 
-    fn row_to_map(&mut self, row:mysql::Row) -> serde_json::Map<String, serde_json::Value>{
+    fn row_to_map(&self, row:mysql::Row) -> serde_json::Map<String, serde_json::Value>{
         let mut map = serde_json::Map::new();
         for column in row.columns_ref() {
             let column_value = &row[column.name_str().as_ref()];
@@ -277,7 +277,16 @@ impl DataBase {
         return map
     }
 
-    pub fn last_insert_id(&mut self)->i64{
+    pub fn last_table_id(&self, table:String)->i64{
+        let result = self.sql(format!("SELECT MAX(id) AS last_id FROM {};", table));
+        let mut last_id = 0;
+        if result.is_ok(){
+            last_id = result.unwrap()[0]["last_id"].as_i64().unwrap();
+        }
+        return last_id;
+    }
+
+    pub fn last_insert_id(&self)->i64{
         let result = self.sql("SELECT LAST_INSERT_ID() as last_insert_id".to_string());
         let mut last_insert_id = 0;
         if result.is_ok(){
