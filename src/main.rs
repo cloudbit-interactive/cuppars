@@ -10,7 +10,6 @@ struct User{
 }
 
 fn main_async() -> Result<()>{
-    
     let db = DataBase::new("localhost", 3306, "rust", "root", "");
     let row = db.get_row("users".to_string(), "id = 1".to_string(), "".to_string(), "".to_string());
     if row.is_err() { return Ok(()); }
