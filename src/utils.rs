@@ -22,3 +22,14 @@ pub fn map_to_struct<T>(map:Map<String, Value>) -> Result<T>
     let value:Value = json!(map);
     T::deserialize(value)
 }
+
+pub fn map_vec_to_struct_vec<T>(map:Vec<Map<String, Value>>) -> Result<Vec<T>>
+    where
+        T: DeserializeOwned,
+{
+    let mut result:Vec<T> = Vec::new();
+    for row in map{
+        result.push(T::deserialize(json!(row))?);
+    }
+    Ok(result)
+}
