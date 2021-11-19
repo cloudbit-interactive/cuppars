@@ -1,5 +1,4 @@
 use cuppa::database::DataBase;
-use cuppa::utils;
 use serde_json::{Result};
 use serde::{Serialize, Deserialize};
 

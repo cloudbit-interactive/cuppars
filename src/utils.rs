@@ -2,6 +2,7 @@
     [dependencies]
     serde_json = "1.0.64"
 */
+use serde::{Serialize};
 use serde_json::{json, Result, Value, Map};
 use serde::de::DeserializeOwned;
 /// # Example:
@@ -32,4 +33,12 @@ pub fn map_vec_to_struct_vec<T>(map:Vec<Map<String, Value>>) -> Result<Vec<T>>
         result.push(T::deserialize(json!(row))?);
     }
     Ok(result)
+}
+
+pub fn struct_to_map<T>(struct_:T) -> Map<String, Value>
+    where
+        T: Serialize,
+{
+    let map:Map<String, Value> = json!(struct_).as_object().unwrap().clone();
+    map
 }
