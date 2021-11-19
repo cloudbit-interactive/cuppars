@@ -170,6 +170,28 @@ impl DataBase {
     } 
 
     /// # Example
+    /// 
+    /// ```
+    /// let total_rows = db.get_total_rows("users".to_string(), "".to_string());
+    /// println!("{:?}", total_rows);
+    /// ```
+    pub fn get_total_rows(&self, table:String, condition:String) 
+    -> std::result::Result<i32, String>
+    {
+        let mut sql = format!("SELECT COUNT(*) AS total FROM {}", table);
+        if condition != "" { sql = format!("{} WHERE {}", sql, condition); }
+
+        let result = self.sql(sql);
+        if result.is_err() {
+            return Err(format!("{}", result.unwrap_err()));
+        }
+
+        let result = result.unwrap();
+        let total = result[0]["total"].as_i64().unwrap();
+        Ok(total as i32)
+    }
+
+    /// # Example
     ///
     /// ```
     /// let row = db.get_row("users".to_string(), "id = 1".to_string(), "".to_string(), "".to_string());
