@@ -187,7 +187,7 @@ dependencies = [
 
 [[package]]
 name = "cuppa"
-version = "0.0.15"
+version = "0.0.16"
 dependencies = [
  "mysql",
  "serde",
