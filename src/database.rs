@@ -259,7 +259,7 @@ impl DataBase {
             let column_name = column.name_str();
             match column_value {
                 _val @ mysql::Value::NULL => {
-                    map.insert(column_name.to_string(), json!(null));
+                    map.insert(column_name.to_string(), json!(""));
                 },
                 val @ mysql::Value::Bytes(..) => {
                     let val:String = mysql::from_value(val.clone());
